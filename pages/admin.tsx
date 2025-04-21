@@ -1,31 +1,74 @@
-import { useState } from 'react'
+// File: pages/admin.tsx
 
-export default function AdminPage() {
-  const [movie, setMovie] = useState({
-    id: "", title: "", poster: "", year: "", rating: "",
-    category: "", stream1: "", stream2: "", download1: ""
-  })
+import { useState } from 'react'; import fs from 'fs'; import path from 'path';
 
-  const handleChange = (e) => setMovie({ ...movie, [e.target.name]: e.target.value })
+const Admin = () => { const [movieId, setMovieId] = useState(''); const [streamLinks, setStreamLinks] = useState(['']); const [downloadLinks, setDownloadLinks] = useState(['']); const [message, setMessage] = useState('');
 
-  const handleAdd = () => {
-    // For now just show data. Later, connect to backend or manually copy.
-    alert(JSON.stringify(movie, null, 2))
-  }
+const handleSubmit = async (e) => { e.preventDefault();
 
-  return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Add New Movie</h2>
-      {["id", "title", "poster", "year", "rating", "category", "stream1", "stream2", "download1"].map(field => (
+const newEntry = {
+  id: movieId,
+  streamLinks: streamLinks.filter(Boolean),
+  downloadLinks: downloadLinks.filter(Boolean),
+};
+
+const res = await fetch('/api/addLink', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(newEntry),
+});
+
+if (res.ok) setMessage('Links added successfully!');
+else setMessage('Error adding links.');
+
+};
+
+return ( <div className="bg-black text-white min-h-screen p-6"> <h1 className="text-2xl mb-4 font-bold">Admin Panel</h1> <form onSubmit={handleSubmit} className="space-y-4"> <input type="text" value={movieId} onChange={(e) => setMovieId(e.target.value)} placeholder="TMDB Movie ID" className="w-full p-2 text-black" required />
+
+<div>
+      <label className="block mb-1">Stream Links</label>
+      {streamLinks.map((link, i) => (
         <input
-          key={field}
-          name={field}
-          onChange={handleChange}
-          placeholder={field}
-          className="block w-full mb-3 px-3 py-2 border rounded"
+          key={i}
+          type="text"
+          value={link}
+          onChange={(e) => {
+            const updated = [...streamLinks];
+            updated[i] = e.target.value;
+            setStreamLinks(updated);
+          }}
+          className="w-full p-2 mb-2 text-black"
+          placeholder={`Stream Link ${i + 1}`}
         />
       ))}
-      <button onClick={handleAdd} className="bg-black text-white px-4 py-2 rounded">Preview JSON</button>
+      <button type="button" onClick={() => setStreamLinks([...streamLinks, ''])} className="bg-gray-700 px-2 py-1 rounded">+ Add Stream</button>
     </div>
-  )
-}
+
+    <div>
+      <label className="block mb-1">Download Links</label>
+      {downloadLinks.map((link, i) => (
+        <input
+          key={i}
+          type="text"
+          value={link}
+          onChange={(e) => {
+            const updated = [...downloadLinks];
+            updated[i] = e.target.value;
+            setDownloadLinks(updated);
+          }}
+          className="w-full p-2 mb-2 text-black"
+          placeholder={`Download Link ${i + 1}`}
+        />
+      ))}
+      <button type="button" onClick={() => setDownloadLinks([...downloadLinks, ''])} className="bg-gray-700 px-2 py-1 rounded">+ Add Download</button>
+    </div>
+
+    <button type="submit" className="bg-blue-600 px-4 py-2 rounded">Save</button>
+    {message && <p className="mt-2 text-green-400">{message}</p>}
+  </form>
+</div>
+
+); };
+
+export default Admin;
+
