@@ -1,0 +1,15 @@
+[
+  {
+    "id": "avengers-endgame-2019",
+    "title": "Avengers: Endgame",
+    "poster": "https://image.tmdb.org/t/p/w500/q6725aR8Zs4IwGMXzZT8aC8lh41.jpg",
+    "year": "2019",
+    "rating": "8.4",
+    "category": "Hollywood",
+    "servers": {
+      "stream1": "https://streamtape.com/v/123abc",
+      "stream2": "https://earnvids.com/v/xyz123",
+      "download1": "https://pixeldrain.com/u/xyz789"
+    }
+  }
+]
